@@ -2,32 +2,40 @@
 
 Bu proje, grup çalışması için hazırlanmış başlangıç düzeyinde bir Python + Selenium + pytest otomasyon framework'üdür. Amaç; ortak bir temel yapı kurmak, Chrome ve Firefox desteğini hazır hale getirmek ve ekip arkadaşlarının arama, sonuç seçme ve assertion senaryolarını bu yapı üstüne ekleyebilmesini sağlamaktır.
 
-## Proje amacı ve kapsam
+---
 
-- Python, Selenium WebDriver ve pytest ile sade bir test otomasyon iskeleti sunar.
-- Chrome ve Firefox browser desteği içerir.
-- `sleep` kullanmaz, explicit wait yaklaşımını temel alır.
-- Page Object yapısına uygun genişletilebilir bir temel sağlar.
-- GitHub üzerinde ekipçe çalışmaya uygun klasör düzeni içerir.
+## 🚀 Proje amacı ve kapsam
 
-## macOS ön koşulları
+* Python, Selenium WebDriver ve pytest ile sade bir test otomasyon iskeleti sunar.
+* Chrome ve Firefox browser desteği içerir.
+* `sleep` kullanmaz, explicit wait yaklaşımını temel alır.
+* Page Object Model (POM) yapısına uygundur.
+* Ekip çalışmasına uygun modüler yapı sunar.
 
-- Python 3.11 veya üzeri yüklü olmalı.
-- Google Chrome kurulu olmalı.
-- Mozilla Firefox kurulu olmalı.
-- Terminal üzerinden `python3` komutu çalışmalı.
-- İlk Selenium çalıştırmasında Selenium Manager driver çözümlemesi için internet erişimi gerekebilir.
+---
 
-## Kurulum adımları
+## 💻 Ön koşullar
 
-1. Proje klasörüne girin.
-2. Python sürümünü kontrol edin.
-3. Sanal ortam oluşturun.
-4. Sanal ortamı aktive edin.
-5. `pip` sürümünü güncelleyin.
-6. Bağımlılıkları yükleyin.
+* Python 3.11+
+* Google Chrome
+* Mozilla Firefox
+* İnternet bağlantısı (Selenium Manager için)
 
-## Terminal komutları
+---
+
+## ⚙️ Kurulum
+
+### Windows (PowerShell)
+
+```bash
+python --version
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+### macOS / Linux
 
 ```bash
 python3 --version
@@ -35,12 +43,11 @@ python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
 pip install -r requirements.txt
-pytest -v
-pytest -v --browser chrome
-pytest -v --browser firefox
 ```
 
-## Proje klasör yapısı
+---
+
+## 📁 Proje yapısı
 
 ```text
 selenium-automation-project/
@@ -49,103 +56,106 @@ selenium-automation-project/
 ├── .gitignore
 ├── pages/
 │   ├── __init__.py
-│   └── base_page.py
+│   ├── base_page.py
+│   └── home_page.py          # (2. kişi ekledi)
 ├── utils/
 │   ├── __init__.py
 │   ├── driver_factory.py
 │   └── wait_helpers.py
 └── tests/
     ├── conftest.py
-    └── test_smoke_setup.py
+    ├── test_smoke_setup.py
+    └── test_home_navigation.py   # (2. kişi ekledi)
 ```
 
-## Framework yapısı
+---
 
-### `utils/driver_factory.py`
+## 🧱 Framework bileşenleri
 
-- Browser adına göre Chrome veya Firefox driver başlatır.
-- Selenium Manager sayesinde ekstra driver paketi gerektirmez.
-- Sayfa yükleme timeout'unu ayarlar.
-- Uygun olduğunda pencereyi büyütmeye çalışır.
+### driver_factory.py
 
-### `utils/wait_helpers.py`
+* Chrome ve Firefox driver başlatır
+* Selenium Manager kullanır
 
-- Explicit wait fonksiyonlarını merkezi olarak toplar.
-- Görünürlük, tıklanabilirlik ve DOM içinde var olma beklemeleri içerir.
+### wait_helpers.py
 
-### `pages/base_page.py`
+* Explicit wait fonksiyonları içerir
+* visibility / clickable / presence
 
-- Ortak page metodlarını barındırır.
-- Yeni page class'ları bu sınıftan türetilebilir.
+### base_page.py
 
-### `tests/conftest.py`
+* Ortak page metodları
+* click, type, wait gibi işlemler
 
-- `pytest` için ortak fixture'ları tanımlar.
-- `--browser` parametresi ile testlerin hangi browser'da çalışacağını belirler.
-- Varsayılan olarak testleri hem Chrome hem Firefox üzerinde koşturur.
+---
 
-### `tests/test_smoke_setup.py`
+## 🆕 HomePage (2. kişi)
 
-- Framework kurulumunu doğrulayan temel smoke testtir.
-- Hepsiburada ana sayfasını açar.
-- Sayfa başlığının boş olmadığını kontrol eder.
+* Siteyi açar
+* Sayfa yüklenmesini bekler (explicit wait)
+* Title doğrulaması yapar
 
-## Testleri çalıştırma
+---
 
-Tüm browser'larda çalıştırmak için:
+## 🧪 Testler
+
+### Smoke test
 
 ```bash
 pytest -v
 ```
 
-Sadece Chrome için:
+### Chrome
 
 ```bash
 pytest -v --browser chrome
 ```
 
-Sadece Firefox için:
+### Firefox
 
 ```bash
 pytest -v --browser firefox
 ```
 
-Hem Chrome hem Firefox için açık şekilde belirtmek isterseniz:
+---
 
-```bash
-pytest -v --browser all
-```
+## 🔍 Browser seçimi
 
-## Browser seçme mantığı
+* `chrome`
+* `firefox`
+* `all` (default)
 
-- `--browser chrome`: yalnızca Chrome çalışır.
-- `--browser firefox`: yalnızca Firefox çalışır.
-- `--browser all`: aynı test seti iki browser'da da çalışır.
-- Parametre verilmezse varsayılan değer `all` olur.
+---
 
-## GitHub branch önerileri
+## 🔄 Git workflow
 
-- Ana branch: `main`
-- Framework kurulumu için: `feature/framework-setup`
-- Arama senaryoları için: `feature/search`
-- Sonuç seçme akışı için: `feature/result-selection`
-- Assertion ve doğrulama işleri için: `feature/assertions`
+* main → stabil
+* feature/navigation → 2. kişi
+* feature/search → 3. kişi
+* feature/result-selection → 4. kişi
 
-Önerilen akış:
+---
 
-1. Her ekip üyesi kendi feature branch'i üzerinde çalışsın.
-2. Tamamlanan iş için pull request açılsın.
-3. Kod incelemesi sonrası `main` branch'ine merge yapılsın.
-4. Ortak framework dosyalarında değişiklik yaparken çakışma riskine dikkat edilsin.
+## 👨‍💻 2. kişinin yaptığı işler
 
-## Genişletme önerisi
+* HomePage Page Object oluşturuldu
+* Navigation (site açma) implemente edildi
+* Explicit wait kullanıldı
+* Title doğrulaması eklendi
+* Testler Chrome + Firefox’ta çalıştırıldı
 
-- `pages/` klasörü içine `home_page.py`, `search_results_page.py` gibi yeni page object dosyaları eklenebilir.
-- Ortak locator ve yardımcı metodlar gerektiğinde `BasePage` içinde büyütülebilir.
-- İleride `pytest.ini`, logging, screenshot alma ve CI entegrasyonu eklenebilir.
+---
 
-## Yapılacaklar
+## 📈 Genişletme
 
-- Hepsiburada ana sayfası için ilk gerçek page object sınıfını ekleyin.
-- Arama kutusu ve arama sonucu akışını ayrı test senaryolarına bölün.
-- Assertion yapısını ekip içinde ortak bir standarda bağlayın.
+* search_results_page.py eklenebilir
+* ürün seçme akışı eklenebilir
+* assertion standardı geliştirilebilir
+
+---
+
+## 📝 Yapılacaklar
+
+* Search senaryosu (3. kişi)
+* Result validation (4. kişi)
+* Ortak assertion standardı
