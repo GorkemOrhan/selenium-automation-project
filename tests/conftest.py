@@ -2,6 +2,10 @@ import sys
 from pathlib import Path
 
 import pytest
+from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
@@ -39,3 +43,40 @@ def driver(browser_name):
     web_driver = create_driver(browser_name)
     yield web_driver
     web_driver.quit()
+
+
+@pytest.fixture(autouse=True)
+def handle_popup(driver, base_url):
+    """Opens homepage, closes cookie banner, waits for search box to be ready."""
+    driver.get(base_url)
+    try:
+        WebDriverWait(driver, 8).until(
+            lambda d: d.execute_script("""
+                const host = document.querySelector('efilli-layout-dynamic');
+                if (!host || !host.shadowRoot) return false;
+                return !!host.shadowRoot.querySelector('#hb-accept-all');
+            """)
+        )
+        driver.execute_script("""
+            document.querySelector('efilli-layout-dynamic')
+                .shadowRoot.querySelector('#hb-accept-all').click();
+        """)
+        WebDriverWait(driver, 5).until(
+            lambda d: not d.execute_script("""
+                const host = document.querySelector('efilli-layout-dynamic');
+                if (!host || !host.shadowRoot) return false;
+                return !!host.shadowRoot.querySelector('#hb-accept-all');
+            """)
+        )
+    except TimeoutException:
+        pass
+
+    # Arama wrapper'ının DOM'da hazır olmasını bekle
+    try:
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, 'div[role="search"]'))
+        )
+    except TimeoutException:
+        pass
+
+    yield

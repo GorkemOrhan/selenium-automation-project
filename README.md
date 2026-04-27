@@ -2,7 +2,7 @@
 
 Bu proje, Python tabanli bir Selenium UI test otomasyon iskeletidir. `pytest` ile calisir, `Page Object Model (POM)` yapisini izler ve Chrome ile Firefox uzerinde temel web senaryolari kosturmak icin hazir bir temel sunar.
 
-Mevcut durumda proje, Hepsiburada ana sayfasina yonelik basit smoke ve navigation testleri icerir. Amac; ekip calismasinda buyutulebilecek sade, okunabilir ve tekrar kullanilabilir bir framework olusturmaktir.
+Mevcut durumda proje, Hepsiburada ana sayfasina yonelik smoke, navigation ve arama akisi testleri icerir. Amac; ekip calismasinda buyutulebilecek sade, okunabilir ve tekrar kullanilabilir bir framework olusturmaktir.
 
 ## Ozet
 
@@ -17,6 +17,7 @@ Mevcut durumda proje, Hepsiburada ana sayfasina yonelik basit smoke ve navigatio
 - Python 3.11+
 - Selenium 4
 - pytest 8+
+- pytest-rerunfailures 16+
 
 ## Proje Yapisi
 
@@ -35,10 +36,11 @@ selenium-automation-project/
 `-- tests/
     |-- conftest.py
     |-- test_smoke_setup.py
-    `-- test_home_navigation.py
+    |-- test_home_navigation.py
+    `-- test_search_flow.py
 ```
 
-## Klasorlar Ne Ise Yarar
+## Klasorler Ne Ise Yarar
 
 ### `pages/`
 
@@ -58,9 +60,10 @@ Tekrar kullanilan altyapi yardimcilari burada yer alir.
 
 Pytest testleri ve fixture tanimlari burada bulunur.
 
-- `conftest.py`: `driver`, `base_url` ve `--browser` parametresini tanimlar
+- `conftest.py`: `driver`, `base_url`, `--browser` parametresini ve cookie banner kapatma fixture'ini tanimlar
 - `test_smoke_setup.py`: Sayfa title'inin bos gelmedigini kontrol eden temel smoke testi
 - `test_home_navigation.py`: Ana sayfa navigation ve title dogrulamasi yapan test
+- `test_search_flow.py`: Arama kutusu ile urun arama akisini test eden senaryo
 
 ## Kurulum
 
@@ -118,6 +121,12 @@ Tum desteklenen browser'larda ayni testleri kosturmak icin:
 pytest -v --browser all
 ```
 
+Flaky testleri otomatik yeniden calistirmak icin:
+
+```bash
+pytest -v --browser all --reruns 3 --reruns-delay 1
+```
+
 ## Browser Secim Mantigi
 
 Proje `pytest` custom argument yapisi kullanir:
@@ -150,6 +159,36 @@ Bu test:
 - Title icinde `Hepsiburada` gecene kadar bekler
 - Sayfanin beklenen sekilde yuklendigini dogrular
 
+### 3. Search Flow Testi
+
+`tests/test_search_flow.py`
+
+Bu test:
+
+- Ana sayfayi acar ve cookie banner'ini kapatir
+- Arama kutusuna urun adi yazar ve arama yapar
+- URL'nin arama sonuc sayfasina yonlendigini dogrular
+- Birden fazla keyword ile parametrize testler icerir (`telefon`, `laptop`, `kulaklık`)
+- Chrome ve Firefox uzerinde calisir
+
+Teknik notlar:
+
+- Hepsiburada cookie banner'i Shadow DOM (`efilli-layout-dynamic`) icinde oldugu icin JavaScript ile kapatilir
+- Arama kutusu onundeki wrapper div nedeniyle `ActionChains` kullanilir
+- Firefox render timing farkindan kaynaklanan flaky durumlar `pytest-rerunfailures` ile yonetilir
+
+### 4. Arama Sonucu Dogrulama Testi
+
+`tests/test_search_result.py`
+
+> **Not:** Bu senaryo gelistirilme asamasindadir.
+
+Bu test:
+
+- Arama yapildiktan sonra sonuc sayfasinin yuklendigini dogrular
+- Sonuc listesindeki ilk urunu bulur ve gorunur oldugunu kontrol eder (`result.is_displayed()`)
+- Test tamamlandiktan sonra driver'i kapatir (`driver.quit()`)
+
 ## Framework Davranisi
 
 ### Driver yonetimi
@@ -163,6 +202,7 @@ Ayrica:
 
 - Sayfa yuklenme zaman asimi `30` saniye olarak ayarlanir
 - Mumkun oldugunda pencere maximize edilir
+- Chrome ve Firefox'ta bildirim izin popup'lari varsayilan olarak devre disi birakilir
 
 ### Wait yaklasimi
 
@@ -171,6 +211,7 @@ Ayrica:
 - `wait_for_visibility`
 - `wait_for_clickable`
 - `wait_for_presence`
+- `wait_for_url_to_contain`
 
 Varsayilan timeout degeri `10` saniyedir.
 
@@ -187,8 +228,18 @@ Varsayilan timeout degeri `10` saniyedir.
 - `get_text`
 - `get_title`
 - `current_url`
+- `wait_for_url_to_contain`
 
 Bu yapi sayesinde testler daha okunabilir kalir ve locator/etkilesim mantigi page object katmaninda toplanir.
+
+### Cookie Banner Yonetimi
+
+Hepsiburada cookie banner'i Shadow DOM icinde yuklenir. `conftest.py` icindeki `handle_popup` fixture'i her test oncesinde otomatik olarak calisir ve banner'i JavaScript ile kapatir:
+
+```python
+document.querySelector('efilli-layout-dynamic')
+    .shadowRoot.querySelector('#hb-accept-all').click()
+```
 
 ## Yeni Test veya Page Object Ekleme
 
@@ -199,13 +250,6 @@ Projeyi buyutmek icin tipik akis su sekildedir:
 3. `tests/` altinda yeni pytest dosyasi olusturun
 4. Testte page object'i kullanarak senaryoyu yazin
 5. Gerekiyorsa ortak helper'lari `utils/` altina ekleyin
-
-Ornek genisleme alanlari:
-
-- Arama kutusu senaryolari
-- Sonuc listesinin dogrulanmasi
-- Urun detay sayfasina gecis
-- Sepete ekleme akislari
 
 ## Faydali Notlar
 

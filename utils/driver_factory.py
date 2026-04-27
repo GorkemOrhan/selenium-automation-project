@@ -9,9 +9,13 @@ def create_driver(browser_name: str):
 
     if normalized_browser == "chrome":
         options = ChromeOptions()
+        options.add_argument("--disable-notifications")
         driver = webdriver.Chrome(options=options)
     elif normalized_browser == "firefox":
         options = FirefoxOptions()
+        # Bildirim izin popup'ını devre dışı bırak
+        options.set_preference("dom.webnotifications.enabled", False)
+        options.set_preference("dom.push.enabled", False)
         driver = webdriver.Firefox(options=options)
     else:
         raise ValueError(

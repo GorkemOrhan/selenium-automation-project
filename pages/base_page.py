@@ -3,6 +3,7 @@ from utils.wait_helpers import (
     wait_for_clickable,
     wait_for_presence,
     wait_for_visibility,
+    wait_for_url_to_contain,
 )
 
 
@@ -44,3 +45,6 @@ class BasePage:
 
     def current_url(self):
         return self.driver.current_url
+
+    def wait_for_url_to_contain(self, keyword, timeout=None):
+        wait_for_url_to_contain(self.driver, keyword, timeout or self.timeout)
