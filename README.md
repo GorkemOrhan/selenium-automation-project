@@ -1,33 +1,80 @@
 # Selenium Automation Project
 
-Bu proje, grup çalışması için hazırlanmış başlangıç düzeyinde bir Python + Selenium + pytest otomasyon framework'üdür. Amaç; ortak bir temel yapı kurmak, Chrome ve Firefox desteğini hazır hale getirmek ve ekip arkadaşlarının arama, sonuç seçme ve assertion senaryolarını bu yapı üstüne ekleyebilmesini sağlamaktır.
+Bu proje, Python tabanli bir Selenium UI test otomasyon iskeletidir. `pytest` ile calisir, `Page Object Model (POM)` yapisini izler ve Chrome ile Firefox uzerinde temel web senaryolari kosturmak icin hazir bir temel sunar.
 
-## Proje amacı ve kapsam
+Mevcut durumda proje, eBay ana sayfasina yonelik basit smoke ve navigation testleri icerir. Amac; ekip calismasinda buyutulebilecek sade, okunabilir ve tekrar kullanilabilir bir framework olusturmaktir.
 
-- Python, Selenium WebDriver ve pytest ile sade bir test otomasyon iskeleti sunar.
-- Chrome ve Firefox browser desteği içerir.
-- `sleep` kullanmaz, explicit wait yaklaşımını temel alır.
-- Page Object yapısına uygun genişletilebilir bir temel sağlar.
-- GitHub üzerinde ekipçe çalışmaya uygun klasör düzeni içerir.
+## Ozet
 
-## macOS ön koşulları
+- Python + Selenium WebDriver + pytest kullanir
+- Chrome ve Firefox destegi vardir
+- `sleep` yerine explicit wait yaklasimi kullanilir
+- POM yapisiyla sayfa davranislari testlerden ayrilir
+- Yeni test ve page object eklemeye uygun moduler klasor yapisi sunar
 
-- Python 3.11 veya üzeri yüklü olmalı.
-- Google Chrome kurulu olmalı.
-- Mozilla Firefox kurulu olmalı.
-- Terminal üzerinden `python3` komutu çalışmalı.
-- İlk Selenium çalıştırmasında Selenium Manager driver çözümlemesi için internet erişimi gerekebilir.
+## Kullanilan Teknolojiler
 
-## Kurulum adımları
+- Python 3.11+
+- Selenium 4
+- pytest 8+
 
-1. Proje klasörüne girin.
-2. Python sürümünü kontrol edin.
-3. Sanal ortam oluşturun.
-4. Sanal ortamı aktive edin.
-5. `pip` sürümünü güncelleyin.
-6. Bağımlılıkları yükleyin.
+## Proje Yapisi
 
-## Terminal komutları
+```text
+selenium-automation-project/
+|-- README.md
+|-- requirements.txt
+|-- pages/
+|   |-- __init__.py
+|   |-- base_page.py
+|   `-- home_page.py
+|-- utils/
+|   |-- __init__.py
+|   |-- driver_factory.py
+|   `-- wait_helpers.py
+`-- tests/
+    |-- conftest.py
+    |-- test_smoke_setup.py
+    `-- test_home_navigation.py
+```
+
+## Klasorlar Ne Ise Yarar
+
+### `pages/`
+
+Sayfaya ozel davranislar burada tutulur.
+
+- `base_page.py`: Ortak Selenium yardimcilari bulunur
+- `home_page.py`: Ana sayfa acma, yuklenme bekleme ve title kontrolu gibi akislari icerir
+
+### `utils/`
+
+Tekrar kullanilan altyapi yardimcilari burada yer alir.
+
+- `driver_factory.py`: Browser tipine gore WebDriver olusturur
+- `wait_helpers.py`: Explicit wait fonksiyonlarini saglar
+
+### `tests/`
+
+Pytest testleri ve fixture tanimlari burada bulunur.
+
+- `conftest.py`: `driver`, `base_url` ve `--browser` parametresini tanimlar
+- `test_smoke_setup.py`: Sayfa title'inin bos gelmedigini kontrol eden temel smoke testi
+- `test_home_navigation.py`: Ana sayfa navigation ve title dogrulamasi yapan test
+
+## Kurulum
+
+### Windows PowerShell
+
+```powershell
+python --version
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+### macOS / Linux
 
 ```bash
 python3 --version
@@ -35,117 +82,148 @@ python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
 pip install -r requirements.txt
-pytest -v
-pytest -v --browser chrome
-pytest -v --browser firefox
 ```
 
-## Proje klasör yapısı
+## Gereksinimler
 
-```text
-selenium-automation-project/
-├── README.md
-├── requirements.txt
-├── .gitignore
-├── pages/
-│   ├── __init__.py
-│   └── base_page.py
-├── utils/
-│   ├── __init__.py
-│   ├── driver_factory.py
-│   └── wait_helpers.py
-└── tests/
-    ├── conftest.py
-    └── test_smoke_setup.py
-```
+- Python 3.11 veya ustu
+- Google Chrome ve/veya Mozilla Firefox
+- Internet baglantisi
 
-## Framework yapısı
+Not: Selenium 4 ile birlikte Selenium Manager kullanildigi icin cogu durumda driver binary dosyalarini manuel indirmeniz gerekmez.
 
-### `utils/driver_factory.py`
+## Testleri Calistirma
 
-- Browser adına göre Chrome veya Firefox driver başlatır.
-- Selenium Manager sayesinde ekstra driver paketi gerektirmez.
-- Sayfa yükleme timeout'unu ayarlar.
-- Uygun olduğunda pencereyi büyütmeye çalışır.
-
-### `utils/wait_helpers.py`
-
-- Explicit wait fonksiyonlarını merkezi olarak toplar.
-- Görünürlük, tıklanabilirlik ve DOM içinde var olma beklemeleri içerir.
-
-### `pages/base_page.py`
-
-- Ortak page metodlarını barındırır.
-- Yeni page class'ları bu sınıftan türetilebilir.
-
-### `tests/conftest.py`
-
-- `pytest` için ortak fixture'ları tanımlar.
-- `--browser` parametresi ile testlerin hangi browser'da çalışacağını belirler.
-- Varsayılan olarak testleri hem Chrome hem Firefox üzerinde koşturur.
-
-### `tests/test_smoke_setup.py`
-
-- Framework kurulumunu doğrulayan temel smoke testtir.
-- Hepsiburada ana sayfasını açar.
-- Sayfa başlığının boş olmadığını kontrol eder.
-
-## Testleri çalıştırma
-
-Tüm browser'larda çalıştırmak için:
+Tum testleri varsayilan browser secimiyle calistirmak icin:
 
 ```bash
 pytest -v
 ```
 
-Sadece Chrome için:
+Sadece Chrome icin:
 
 ```bash
 pytest -v --browser chrome
 ```
 
-Sadece Firefox için:
+Sadece Firefox icin:
 
 ```bash
 pytest -v --browser firefox
 ```
 
-Hem Chrome hem Firefox için açık şekilde belirtmek isterseniz:
+Tum desteklenen browser'larda ayni testleri kosturmak icin:
 
 ```bash
 pytest -v --browser all
 ```
 
-## Browser seçme mantığı
+## Browser Secim Mantigi
 
-- `--browser chrome`: yalnızca Chrome çalışır.
-- `--browser firefox`: yalnızca Firefox çalışır.
-- `--browser all`: aynı test seti iki browser'da da çalışır.
-- Parametre verilmezse varsayılan değer `all` olur.
+Proje `pytest` custom argument yapisi kullanir:
 
-## GitHub branch önerileri
+- `chrome`: Testler sadece Chrome uzerinde calisir
+- `firefox`: Testler sadece Firefox uzerinde calisir
+- `all`: Her test hem Chrome hem Firefox icin parametrize edilir
 
-- Ana branch: `main`
-- Framework kurulumu için: `feature/framework-setup`
-- Arama senaryoları için: `feature/search`
-- Sonuç seçme akışı için: `feature/result-selection`
-- Assertion ve doğrulama işleri için: `feature/assertions`
+Varsayilan deger `all` oldugu icin `pytest -v` komutu her iki browser'i da hedefler.
 
-Önerilen akış:
+## Mevcut Test Senaryolari
 
-1. Her ekip üyesi kendi feature branch'i üzerinde çalışsın.
-2. Tamamlanan iş için pull request açılsın.
-3. Kod incelemesi sonrası `main` branch'ine merge yapılsın.
-4. Ortak framework dosyalarında değişiklik yaparken çakışma riskine dikkat edilsin.
+### 1. Smoke Setup Testi
 
-## Genişletme önerisi
+`tests/test_smoke_setup.py`
 
-- `pages/` klasörü içine `home_page.py`, `search_results_page.py` gibi yeni page object dosyaları eklenebilir.
-- Ortak locator ve yardımcı metodlar gerektiğinde `BasePage` içinde büyütülebilir.
-- İleride `pytest.ini`, logging, screenshot alma ve CI entegrasyonu eklenebilir.
+Bu test:
 
-## Yapılacaklar
+- Browser'i acar
+- eBay ana sayfasina gider
+- Sayfa title bilgisinin bos olmadigini dogrular
 
-- Hepsiburada ana sayfası için ilk gerçek page object sınıfını ekleyin.
-- Arama kutusu ve arama sonucu akışını ayrı test senaryolarına bölün.
-- Assertion yapısını ekip içinde ortak bir standarda bağlayın.
+### 2. Home Navigation Testi
+
+`tests/test_home_navigation.py`
+
+Bu test:
+
+- Ana sayfayi acar
+- Title icinde `ebay` gecene kadar bekler
+- Sayfanin beklenen sekilde yuklendigini dogrular
+
+## Framework Davranisi
+
+### Driver yonetimi
+
+`utils/driver_factory.py` dosyasi secilen browser'a gore ilgili WebDriver'i olusturur:
+
+- `chrome` icin `webdriver.Chrome()`
+- `firefox` icin `webdriver.Firefox()`
+
+Ayrica:
+
+- Sayfa yuklenme zaman asimi `30` saniye olarak ayarlanir
+- Mumkun oldugunda pencere maximize edilir
+
+### Wait yaklasimi
+
+`utils/wait_helpers.py` icindeki yardimcilar explicit wait kullanir:
+
+- `wait_for_visibility`
+- `wait_for_clickable`
+- `wait_for_presence`
+
+Varsayilan timeout degeri `10` saniyedir.
+
+### Base Page
+
+`pages/base_page.py` ortak Selenium islemlerini merkezilestirir:
+
+- `open`
+- `find_visible`
+- `find_clickable`
+- `find_present`
+- `click`
+- `type_text`
+- `get_text`
+- `get_title`
+- `current_url`
+
+Bu yapi sayesinde testler daha okunabilir kalir ve locator/etkilesim mantigi page object katmaninda toplanir.
+
+## Yeni Test veya Page Object Ekleme
+
+Projeyi buyutmek icin tipik akis su sekildedir:
+
+1. `pages/` altina yeni bir page object ekleyin
+2. Sayfaya ozel locator ve davranislari bu dosyada toplayin
+3. `tests/` altinda yeni pytest dosyasi olusturun
+4. Testte page object'i kullanarak senaryoyu yazin
+5. Gerekiyorsa ortak helper'lari `utils/` altina ekleyin
+
+Ornek genisleme alanlari:
+
+- Arama kutusu senaryolari
+- Sonuc listesinin dogrulanmasi
+- Urun detay sayfasina gecis
+- Sepete ekleme akislari
+
+## Faydali Notlar
+
+- Testler gercek browser acarak calisir
+- UI testleri, site tasarimi veya title davranisi degistiginde guncelleme gerektirebilir
+- Bu iskelet, ileri seviyede raporlama, screenshot alma, logging veya CI entegrasyonu ile genisletilebilir
+
+## Gelistirme Fikirleri
+
+Ileride su iyilestirmeler eklenebilir:
+
+- Ortam bazli `base_url` yonetimi
+- `.env` veya config yapisi
+- Screenshot capture on failure
+- HTML test report
+- CI/CD entegrasyonu
+- Locator sabitlerinin daha sistematik yonetimi
+
+## Lisans
+
+Bu repo icin lisans bilgisi tanimli degilse, ihtiyaca gore bir `LICENSE` dosyasi eklenebilir.
