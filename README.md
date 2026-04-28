@@ -2,7 +2,7 @@
 
 Bu proje, Python tabanli bir Selenium UI test otomasyon iskeletidir. `pytest` ile calisir, `Page Object Model (POM)` yapisini izler ve Chrome ile Firefox uzerinde temel web senaryolari kosturmak icin hazir bir temel sunar.
 
-Mevcut durumda proje, Hepsiburada ana sayfasina yonelik basit smoke ve navigation testleri icerir. Amac; ekip calismasinda buyutulebilecek sade, okunabilir ve tekrar kullanilabilir bir framework olusturmaktir.
+Mevcut durumda proje, eBay ana sayfasina yonelik basit smoke ve navigation testleri icerir. Amac; ekip calismasinda buyutulebilecek sade, okunabilir ve tekrar kullanilabilir bir framework olusturmaktir.
 
 ## Ozet
 
@@ -137,7 +137,7 @@ Varsayilan deger `all` oldugu icin `pytest -v` komutu her iki browser'i da hedef
 Bu test:
 
 - Browser'i acar
-- Hepsiburada ana sayfasina gider
+- eBay ana sayfasina gider
 - Sayfa title bilgisinin bos olmadigini dogrular
 
 ### 2. Home Navigation Testi
@@ -147,7 +147,7 @@ Bu test:
 Bu test:
 
 - Ana sayfayi acar
-- Title icinde `Hepsiburada` gecene kadar bekler
+- Title icinde `ebay` gecene kadar bekler
 - Sayfanin beklenen sekilde yuklendigini dogrular
 
 ## Framework Davranisi

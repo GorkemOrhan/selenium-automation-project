@@ -31,7 +31,7 @@ def pytest_generate_tests(metafunc):
 
 @pytest.fixture
 def base_url():
-    return "https://www.hepsiburada.com/"
+    return "https://www.ebay.com/"
 
 
 @pytest.fixture

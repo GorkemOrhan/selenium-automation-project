@@ -10,8 +10,8 @@ class HomePage(BasePage):
 
     def wait_until_loaded(self):
         WebDriverWait(self.driver, self.timeout).until(
-            EC.title_contains("Hepsiburada")
+            EC.title_contains("eBay")
         )
 
     def is_loaded(self):
-        return "Hepsiburada" in self.get_title()
+        return "eBay" in self.get_title()
