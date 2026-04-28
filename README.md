@@ -2,7 +2,7 @@
 
 Bu proje, Python tabanli bir Selenium UI test otomasyon iskeletidir. `pytest` ile calisir, `Page Object Model (POM)` yapisini izler ve Chrome ile Firefox uzerinde temel web senaryolari kosturmak icin hazir bir temel sunar.
 
-Mevcut durumda proje, eBay ana sayfasina yonelik basit smoke ve navigation testleri icerir. Amac; ekip calismasinda buyutulebilecek sade, okunabilir ve tekrar kullanilabilir bir framework olusturmaktir.
+Mevcut durumda proje, eBay ana sayfasina yonelik basit smoke, navigation ve search flow testleri icerir. Amac; ekip calismasinda buyutulebilecek sade, okunabilir ve tekrar kullanilabilir bir framework olusturmaktir.
 
 ## Ozet
 
@@ -35,7 +35,8 @@ selenium-automation-project/
 `-- tests/
     |-- conftest.py
     |-- test_smoke_setup.py
-    `-- test_home_navigation.py
+    |-- test_home_navigation.py
+    `-- test_search_flow.py
 ```
 
 ## Klasorlar Ne Ise Yarar
@@ -61,6 +62,7 @@ Pytest testleri ve fixture tanimlari burada bulunur.
 - `conftest.py`: `driver`, `base_url` ve `--browser` parametresini tanimlar
 - `test_smoke_setup.py`: Sayfa title'inin bos gelmedigini kontrol eden temel smoke testi
 - `test_home_navigation.py`: Ana sayfa navigation ve title dogrulamasi yapan test
+- `test_search_flow.py`: Ana sayfada arama kutusuna anahtar kelime yazip arama sonuc sayfasina gecisi dogrulayan test
 
 ## Kurulum
 
@@ -149,6 +151,17 @@ Bu test:
 - Ana sayfayi acar
 - Title icinde `ebay` gecene kadar bekler
 - Sayfanin beklenen sekilde yuklendigini dogrular
+
+### 3. Search Flow Testi
+
+`tests/test_search_flow.py`
+
+Bu test:
+
+- Ana sayfayi acar
+- Title bilgisini dogrular
+- Arama kutusuna anahtar kelime yazar
+- Arama sonuc sayfasina gecildigini dogrular
 
 ## Framework Davranisi
 
