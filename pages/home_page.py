@@ -1,14 +1,31 @@
 from pages.base_page import BasePage
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import ElementClickInterceptedException
 from selenium.common.exceptions import ElementNotInteractableException
+from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import StaleElementReferenceException
 
 
 class HomePage(BasePage):
     SEARCH_INPUT = (By.NAME, "_nkw")
+    SEARCH_BUTTON_LOCATORS = (
+        (By.ID, "gh-btn"),
+        (By.ID, "gh-search-btn"),
+        (By.CSS_SELECTOR, "#gh-f button[type='submit']"),
+        (By.CSS_SELECTOR, "#gh-f input[type='submit']"),
+        (By.CSS_SELECTOR, "header button[type='submit']"),
+        (By.CSS_SELECTOR, "[data-marko*='Search'] button[type='submit']"),
+        (
+            By.XPATH,
+            "//input[@name='_nkw']/ancestor::form//button[@type='submit']",
+        ),
+        (
+            By.XPATH,
+            "//input[@name='_nkw']/ancestor::form//input[@type='submit']",
+        ),
+    )
     RESULT_ITEMS = (
         (By.CSS_SELECTOR, "ul.srp-results li.s-item"),
         (By.CSS_SELECTOR, "li.s-item"),
@@ -42,7 +59,16 @@ class HomePage(BasePage):
         )
         search_input.clear()
         search_input.send_keys(product_name)
-        search_input.send_keys(Keys.ENTER)
+        search_button = WebDriverWait(self.driver, self.timeout).until(
+            lambda d: self._resolve_search_submit_after_input(search_input)
+        )
+        self.driver.execute_script(
+            "arguments[0].scrollIntoView({block: 'center'});", search_button
+        )
+        try:
+            search_button.click()
+        except (ElementClickInterceptedException, ElementNotInteractableException):
+            self.driver.execute_script("arguments[0].click();", search_button)
 
     def wait_for_search_results(self, keyword):
         WebDriverWait(self.driver, self.timeout).until(
@@ -109,6 +135,28 @@ class HomePage(BasePage):
         if page_title and "ebay" not in page_title.lower():
             return page_title
         return page_title
+
+    def _resolve_search_submit_after_input(self, search_input):
+        try:
+            submit = search_input.find_element(
+                By.XPATH,
+                "./ancestor::form//*[@type='submit']",
+            )
+            if submit.is_displayed() and submit.is_enabled():
+                return submit
+        except (NoSuchElementException, StaleElementReferenceException):
+            pass
+        return self._find_clickable_search_button()
+
+    def _find_clickable_search_button(self):
+        for locator in self.SEARCH_BUTTON_LOCATORS:
+            for element in self.driver.find_elements(*locator):
+                try:
+                    if element.is_displayed() and element.is_enabled():
+                        return element
+                except Exception:
+                    continue
+        return False
 
     def _find_first_non_empty(self, locators):
         for locator in locators:
