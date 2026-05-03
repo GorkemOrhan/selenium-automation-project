@@ -3,6 +3,7 @@ from pages.home_page import HomePage
 
 
 @pytest.mark.parametrize("keyword", ["kulaklik", "laptop", "phone"])
+# Verify that searching from the homepage leads to a valid product detail page.
 def test_search_flow_from_homepage(driver, base_url, keyword):
     home = HomePage(driver)
 

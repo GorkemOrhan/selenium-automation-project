@@ -1,6 +1,7 @@
 from pages.home_page import HomePage
 
 
+# Verify that the homepage opens and reports a valid title.
 def test_homepage_navigation_and_title(driver, base_url):
     home = HomePage(driver)
 

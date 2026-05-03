@@ -10,6 +10,7 @@ if str(PROJECT_ROOT) not in sys.path:
 from utils.driver_factory import create_driver
 
 
+# Add the browser selection option to pytest.
 def pytest_addoption(parser):
     parser.addoption(
         "--browser",
@@ -20,6 +21,7 @@ def pytest_addoption(parser):
     )
 
 
+# Parameterize tests based on the selected browser option.
 def pytest_generate_tests(metafunc):
     if "browser_name" not in metafunc.fixturenames:
         return
@@ -30,11 +32,13 @@ def pytest_generate_tests(metafunc):
 
 
 @pytest.fixture
+# Provide the base URL used by the tests.
 def base_url():
     return "https://www.ebay.com/"
 
 
 @pytest.fixture
+# Create and close a WebDriver instance for each test.
 def driver(browser_name):
     web_driver = create_driver(browser_name)
     yield web_driver

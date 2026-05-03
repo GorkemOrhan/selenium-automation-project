@@ -42,17 +42,21 @@ class HomePage(BasePage):
         (By.CSS_SELECTOR, "h1 span.ux-textspans"),
     )
 
+    # Open the homepage using the provided URL.
     def open_homepage(self, url):
         self.open(url)
 
+    # Wait until the homepage title confirms the page is loaded.
     def wait_until_loaded(self):
         WebDriverWait(self.driver, self.timeout).until(
             EC.title_contains("eBay")
         )
 
+    # Check whether the homepage title indicates a loaded state.
     def is_loaded(self):
         return "eBay" in self.get_title()
 
+    # Enter a product name and submit the homepage search form.
     def search_for_product(self, product_name):
         search_input = WebDriverWait(self.driver, self.timeout).until(
             EC.visibility_of_element_located(self.SEARCH_INPUT)
@@ -70,25 +74,30 @@ class HomePage(BasePage):
         except (ElementClickInterceptedException, ElementNotInteractableException):
             self.driver.execute_script("arguments[0].click();", search_button)
 
+    # Wait until the search results URL reflects the searched keyword.
     def wait_for_search_results(self, keyword):
         WebDriverWait(self.driver, self.timeout).until(
             lambda d: keyword.lower() in d.current_url.lower()
             or f"_nkw={keyword.lower()}" in d.current_url.lower()
         )
 
+    # Wait until at least one results container or product link is available.
     def wait_for_results_list(self):
         WebDriverWait(self.driver, self.timeout).until(
             lambda d: len(self._get_product_links()) > 0
             or len(self._find_first_non_empty(self.RESULT_ITEMS)) > 0
         )
 
+    # Return the number of detected product result links.
     def get_results_count(self):
         self.wait_for_results_list()
         return len(self._get_product_links())
 
+    # Check whether the results page contains any visible results.
     def has_results(self):
         return self.get_results_count() > 0 or len(self._find_first_non_empty(self.RESULT_ITEMS)) > 0
 
+    # Open the first available product result.
     def click_first_result(self):
         links = WebDriverWait(self.driver, self.timeout).until(
             lambda d: self._get_product_links()
@@ -119,11 +128,13 @@ class HomePage(BasePage):
                     self.driver.switch_to.window(handle)
                     break
 
+    # Wait until the product detail page has a valid title and URL.
     def wait_for_product_detail_loaded(self):
         WebDriverWait(self.driver, self.timeout).until(
             lambda d: d.current_url != "about:blank" and d.title.strip() != ""
         )
 
+    # Return the most reliable product title found on the detail page.
     def get_product_title(self):
         for locator in self.PRODUCT_TITLE:
             elements = self.driver.find_elements(*locator)
@@ -136,6 +147,7 @@ class HomePage(BasePage):
             return page_title
         return page_title
 
+    # Resolve the best submit control related to the active search input.
     def _resolve_search_submit_after_input(self, search_input):
         try:
             submit = search_input.find_element(
@@ -148,6 +160,7 @@ class HomePage(BasePage):
             pass
         return self._find_clickable_search_button()
 
+    # Find the first visible and enabled search button candidate.
     def _find_clickable_search_button(self):
         for locator in self.SEARCH_BUTTON_LOCATORS:
             for element in self.driver.find_elements(*locator):
@@ -158,6 +171,7 @@ class HomePage(BasePage):
                     continue
         return False
 
+    # Return the first locator group that produces elements.
     def _find_first_non_empty(self, locators):
         for locator in locators:
             elements = self.driver.find_elements(*locator)
@@ -165,6 +179,7 @@ class HomePage(BasePage):
                 return elements
         return []
 
+    # Collect enabled product links that point to item detail pages.
     def _get_product_links(self):
         links = self._find_first_non_empty(self.RESULT_ITEM_LINKS)
         product_links = []
